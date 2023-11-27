@@ -13,7 +13,8 @@ export const load = (async () => {
 	};
 
 	user.subscribe((data) => {
-		if (data) {
+		console.log(data);
+		if (data && data.username) {
 			userData = data;
 		} else {
 			console.log('User not logged in');
