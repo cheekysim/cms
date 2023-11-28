@@ -1,26 +1,17 @@
 import type { LayoutServerLoad } from './$types';
 import type { User } from '$lib/types';
-import { user } from '$lib/stores/user';
+import { checkSession } from '$lib/server/checkSession';
 import { redirect } from '@sveltejs/kit';
 
-export const load = (async () => {
+export const load = (async ({ cookies: Cookies }) => {
 	console.log('Checking User Auth');
+	const session = Cookies.get('session') || '';
+	const userData: User = await checkSession(session);
 
-	let userData: User = {
-		username: '',
-		password: '',
-		role: 'user'
-	};
-
-	user.subscribe((data) => {
-		console.log(data);
-		if (data && data.username) {
-			userData = data;
-		} else {
-			console.log('User not logged in');
-			throw redirect(302, '/login');
-		}
-	});
+	if (!userData) {
+		console.log('User Not Authenticated');
+		throw redirect(302, '/login');
+	}
 
 	return {
 		username: userData.username,

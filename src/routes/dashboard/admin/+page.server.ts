@@ -1,28 +1,17 @@
 import type { PageServerLoad } from './$types';
 import type { User } from '$lib/types';
-import { user } from '$lib/stores/user';
+import { checkSession } from '$lib/server/checkSession';
 import { redirect } from '@sveltejs/kit';
 
-export const load = (async () => {
+export const load = (async ({ cookies: Cookies }) => {
 	console.log('Checking User Auth');
+	const session = Cookies.get('session') || '';
+	const userData: User = await checkSession(session);
 
-	let userData: User = {
-		username: '',
-		password: '',
-		role: 'user'
-	};
-
-	user.subscribe((data) => {
-		if (data && data.role === 'admin') {
-			userData = data;
-		} else if (data) {
-			console.log('User not admin');
-			throw redirect(302, '/dashboard');
-		} else {
-			console.log('User not logged in');
-			throw redirect(302, '/login');
-		}
-	});
+	if (!userData || userData.role !== 'admin') {
+		console.log('User Not Admin');
+		throw redirect(302, '/dashboard');
+	}
 
 	return {
 		username: userData.username,

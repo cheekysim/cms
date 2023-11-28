@@ -1,4 +1,5 @@
 import * as mongodb from 'mongodb';
+import { MONGO_IP, MONGO_DB, MONGO_USER, MONGO_PASS } from '$env/static/private';
 
 class MongoDB {
 	private client: mongodb.MongoClient;
@@ -70,6 +71,13 @@ class MongoDB {
 		return await collection.deleteOne(query);
 	}
 
+	async deleteMany(Collection: string, query: object) {
+		console.log(`Deleting ${Collection}`);
+		const con = await this.client.connect();
+		const collection = con.db(this.database).collection(Collection);
+		return await collection.deleteMany(query);
+	}
+
 	async drop(Collection: string) {
 		console.log(`Dropping ${Collection}`);
 		const con = await this.client.connect();
@@ -101,9 +109,10 @@ class MongoDB {
 		return collections.includes(Collection);
 	}
 }
-console.log('Connected to MongoDB');
 
-export { MongoDB };
+const db = new MongoDB(MONGO_IP, MONGO_DB, MONGO_USER, MONGO_PASS);
+
+export { MongoDB, db };
 
 export default {
 	MongoDB

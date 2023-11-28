@@ -1,19 +1,17 @@
 import { error, redirect } from '@sveltejs/kit';
-import { user } from '$lib/stores/user';
-import { MONGO_IP, MONGO_DB, MONGO_USER, MONGO_PASS } from '$env/static/private';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 import bcrypt from 'bcrypt';
 
-import { MongoDB } from '$lib/server/db';
+import { db } from '$lib/server/db';
 
-const db = new MongoDB(MONGO_IP, MONGO_DB, MONGO_USER, MONGO_PASS);
-
-export const load: PageServerLoad = async () => {
-	// todo
+const generateSessionId = (currentSessions: string[]) => {
+	let r = Math.random().toString(36).substring(7);
+	if (currentSessions.includes(r)) r = generateSessionId(currentSessions);
+	return r;
 };
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, cookies: Cookies }) => {
 		const data = await request.formData();
 		const username = data.get('username')?.toString();
 		const password = data.get('password')?.toString();
@@ -26,7 +24,19 @@ export const actions: Actions = {
 		const userPassword = await bcrypt.compare(password, dbuser.password);
 		if (!userPassword) return { status: 401, body: 'Username or Password Incorrect.' };
 
-		user.update(() => ({ username, password, role: dbuser.role }));
+		const currentSessions = await db.read('sessions');
+		const sessionId = generateSessionId(currentSessions.map((s) => s.sessionId));
+
+		const expires = new Date();
+		expires.setHours(expires.getHours() + 1);
+
+		db.write('sessions', { sessionId, username, expires });
+
+		Cookies.set('session', sessionId, {
+			path: '/',
+			sameSite: 'strict',
+			maxAge: 60 * 60 * 24 * 7
+		});
 
 		throw redirect(302, '/dashboard');
 	}
