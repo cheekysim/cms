@@ -10,6 +10,6 @@
 	<h1>Hello, {data.username}!</h1>
 {/if}
 
-<button type="button" on:click={() => goto('/dashboard/logout')}>Logout</button>
+<button type="button" on:click={() => goto('/logout')}>Logout</button>
 
 <slot />
