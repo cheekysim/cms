@@ -4,9 +4,9 @@ import bcrypt from 'bcrypt';
 
 import { db } from '$lib/server/db';
 
-const generateSessionId = (currentSessions: string[]) => {
+const generateID = (currentIDs: string[]) => {
 	let r = Math.random().toString(36).substring(7);
-	if (currentSessions.includes(r)) r = generateSessionId(currentSessions);
+	if (currentIDs.includes(r)) r = generateID(currentIDs);
 	return r;
 };
 
@@ -25,7 +25,7 @@ export const actions: Actions = {
 		if (!userPassword) return { status: 401, body: 'Username or Password Incorrect.' };
 
 		const currentSessions = await db.read('sessions');
-		const sessionId = generateSessionId(currentSessions.map((s) => s.sessionId));
+		const sessionId = generateID(currentSessions.map((s) => s.sessionId));
 
 		const expires = new Date();
 		expires.setHours(expires.getHours() + 1);

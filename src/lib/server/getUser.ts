@@ -1,8 +1,7 @@
 import { db } from './db';
 import type { User } from '$lib/types';
 
-export const checkSession = async (sessionId: string) => {
-	await db.deleteMany('sessions', { expires: { $lt: new Date() } });
+export const getUser = async (sessionId: string) => {
 	const sessions = await db.read('sessions', { sessionId });
 	if (!sessions.length) return null;
 	const username = sessions[0].username;

@@ -1,6 +1,12 @@
 type User = {
+	id: string;
 	username: string;
 	role: 'admin' | 'user';
 } | null;
 
-export type { User };
+type Zone = {
+	id: string;
+	name: string;
+};
+
+export type { User, Zone };
