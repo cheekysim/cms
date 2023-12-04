@@ -1,5 +1,5 @@
 import { db } from './db';
 
-export const deleteSession = async (sessionId: string) => {
-	db.deleteMany('sessions', { sessionId });
+export const deleteSession = async (id: string) => {
+	db.deleteMany('sessions', { id });
 };

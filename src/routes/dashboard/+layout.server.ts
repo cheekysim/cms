@@ -1,17 +1,13 @@
 import type { LayoutServerLoad } from './$types';
 import type { User } from '$lib/types';
-import { checkSession } from '$lib/server/checkSession';
-import { redirect } from '@sveltejs/kit';
+import { handleSessionCheck } from '$lib/handleSessionCheck';
+import { getUser } from '$lib/server/getUser';
 
-export const load = (async ({ cookies: Cookies }) => {
+export const load = (async (event) => {
 	console.log('Checking User Auth');
-	const session = Cookies.get('session') || '';
-	const userData: User = await checkSession(session);
-
-	if (!userData) {
-		console.log('User Not Authenticated');
-		throw redirect(302, '/login');
-	}
+	handleSessionCheck(event);
+	const session = event.cookies.get('session');
+	const userData: User = await getUser(session);
 
 	return {
 		username: userData.username,
