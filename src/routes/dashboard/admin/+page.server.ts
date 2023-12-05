@@ -2,11 +2,10 @@ import type { PageServerLoad } from './$types';
 import type { User } from '$lib/types';
 import { getUser } from '$lib/server/getUser';
 import { redirect } from '@sveltejs/kit';
-import { handleSessionCheck } from '$lib/handleSessionCheck';
+import { handleSessionCheck } from '$lib/server/handleSessionCheck';
 
 export const load = (async (event) => {
-	console.log('Checking User Auth');
-	handleSessionCheck(event);
+	await handleSessionCheck(event);
 	const userData: User = await getUser(event.cookies.get('session'));
 
 	if (userData.role !== 'admin') {

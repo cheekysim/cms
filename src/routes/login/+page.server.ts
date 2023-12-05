@@ -11,7 +11,8 @@ const generateID = (currentIDs: string[]) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies: Cookies }) => {
+	default: async ({ request, cookies }) => {
+		console.log(request.url);
 		const data = await request.formData();
 		const username = data.get('username')?.toString();
 		const password = data.get('password')?.toString();
@@ -32,12 +33,16 @@ export const actions: Actions = {
 
 		db.write('sessions', { id: sessionId, username, expires });
 
-		Cookies.set('session', sessionId, {
+		cookies.set('session', sessionId, {
 			path: '/',
 			sameSite: 'strict',
 			maxAge: 60 * 60 * 24 * 7
 		});
 
-		throw redirect(302, '/dashboard');
+		const url = new URL(request.url);
+
+		const redirectTo = url.searchParams.get('redirectTo') || 'dashboard';
+
+		throw redirect(302, `/${redirectTo}`);
 	}
 };
