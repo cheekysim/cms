@@ -31,7 +31,7 @@ export const actions: Actions = {
 		const expires = new Date();
 		expires.setHours(expires.getHours() + 1);
 
-		db.write('sessions', { id: sessionId, username, expires });
+		db.write('sessions', { id: sessionId, user: dbuser.id, expires });
 
 		cookies.set('session', sessionId, {
 			path: '/',

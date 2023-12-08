@@ -1,6 +1,6 @@
 import type { LayoutServerLoad } from './$types';
 import type { User } from '$lib/types';
-import { handleSessionCheck } from '$lib/server/handleSessionCheck';
+import { handleSessionCheck } from '$lib/server/handleChecks';
 import { getUser } from '$lib/server/getUser';
 
 export const load = (async (event) => {

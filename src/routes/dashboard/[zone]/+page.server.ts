@@ -6,10 +6,11 @@ import { redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/server/getUser';
 import { error } from '@sveltejs/kit';
 import { generateID } from '$lib/generateID';
-import { handleSessionCheck } from '$lib/server/handleSessionCheck';
+import { handleSessionCheck, handleZoneCheck } from '$lib/server/handleChecks';
 
 export const load = (async (event) => {
 	await handleSessionCheck(event);
+	await handleZoneCheck(event);
 
 	const user: User = await getUser(event.cookies.get('session'));
 
