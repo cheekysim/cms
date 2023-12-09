@@ -1,6 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { db } from './db';
+import { ObjectId } from 'mongodb';
 
 export const handleSessionCheck = async (event: RequestEvent) => {
 	// Delete all expired sessions
@@ -8,12 +9,12 @@ export const handleSessionCheck = async (event: RequestEvent) => {
 
 	const session = event.cookies.get('session');
 	if (session) {
-		const exists = (await db.read('sessions', { id: session }))[0];
+		const exists = (await db.read('sessions', { _id: new ObjectId(session) }))[0];
 		if (exists) {
 			// If session is not expired, update the expiration time
 			const expires = new Date();
 			expires.setHours(expires.getHours() + 1);
-			await db.update('sessions', { id: session }, { $set: { expires: expires } });
+			await db.update('sessions', { _id: new ObjectId(session) }, { $set: { expires: expires } });
 			event.cookies.set('session', session, {
 				path: '/',
 				sameSite: 'strict',
@@ -27,12 +28,12 @@ export const handleSessionCheck = async (event: RequestEvent) => {
 };
 
 export const handleZoneCheck = async (event: RequestEvent) => {
-	const session = (await db.read('sessions', { id: event.cookies.get('session') }))[0];
+	const session = (await db.read('sessions', { _id: new ObjectId(event.cookies.get('session')) }))[0];
 	if (!session) {
 		throw redirect(302, '/login');
 	}
-	const zoneID = event.params.zone;
-	const zone = (await db.read('zones', { user: session.user, id: zoneID }))[0];
+	const zoneID = new ObjectId(event.params.zone);
+	const zone = (await db.read('zones', { user: session.user, _id: new ObjectId(zoneID) }))[0];
 	if (!zone) {
 		throw redirect(302, '/dashboard');
 	}

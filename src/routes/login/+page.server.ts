@@ -4,12 +4,6 @@ import bcrypt from 'bcrypt';
 
 import { db } from '$lib/server/db';
 
-const generateID = (currentIDs: string[]) => {
-	let r = Math.random().toString(36).substring(7);
-	if (currentIDs.includes(r)) r = generateID(currentIDs);
-	return r;
-};
-
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
 		console.log(request.url);
@@ -25,15 +19,13 @@ export const actions: Actions = {
 		const userPassword = await bcrypt.compare(password, dbuser.password);
 		if (!userPassword) return { status: 401, body: 'Username or Password Incorrect.' };
 
-		const currentSessions = await db.read('sessions');
-		const sessionId = generateID(currentSessions.map((s) => s.sessionId));
-
 		const expires = new Date();
 		expires.setHours(expires.getHours() + 1);
 
-		db.write('sessions', { id: sessionId, user: dbuser.id, expires });
+		await db.write('sessions', { user: dbuser._id.toString(), expires });
+		const { _id } = (await db.read('sessions', { user: dbuser._id.toString(), expires }))[0];
 
-		cookies.set('session', sessionId, {
+		cookies.set('session', _id.toString(), {
 			path: '/',
 			sameSite: 'strict',
 			maxAge: 60 * 60 * 24 * 7

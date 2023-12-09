@@ -9,7 +9,7 @@ export const load = (async ({ cookies }) => {
 
 	const dbzones = await db.read('zones', { user: user.id });
 	const zones: Zone[] = dbzones.map((z) => ({
-		id: z.id,
+		id: z._id.toString(),
 		name: z.name,
 		user: z.user
 	}));
