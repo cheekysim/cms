@@ -1,0 +1,13 @@
+version: '3'
+services:
+  cms:
+    container_name: cms
+    pull_policy: build
+    build: .
+    restart: unless-stopped
+    environment:
+      - MONGO_IP=${MONGO_IP}
+      - MONGO_DB=${MONGO_DB}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASS=${MONGO_PASS}
+      - PORT=${PORT}
