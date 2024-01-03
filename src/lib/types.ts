@@ -1,17 +1,17 @@
 type User = {
-	id: string;
+	_id: string;
 	username: string;
 	role: 'admin' | 'user';
 };
 
 type Zone = {
-	id: string;
+	_id: string;
 	name: string;
 	user: string;
 };
 
 type Record = {
-	id: string;
+	_id: string;
 	name: string;
 	type: string;
 	content: string;

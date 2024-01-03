@@ -7,9 +7,9 @@ export const load = (async ({ cookies }) => {
 	const session = cookies.get('session');
 	const user: User = await getUser(session);
 
-	const dbzones = await db.read('zones', { user: user.id });
+	const dbzones = await db.read('zones', { user: user._id });
 	const zones: Zone[] = dbzones.map((z) => ({
-		id: z._id.toString(),
+		_id: z._id.toString(),
 		name: z.name,
 		user: z.user
 	}));

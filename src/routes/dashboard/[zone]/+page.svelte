@@ -19,26 +19,26 @@
 <form method="post" action="?/save" style="max-width: 100vw;">
 	<div>
 		{#each records as record}
-			<div id="record-{record.id}" class="record" style="display: inline-block; margin: 0 1rem;">
+			<div id="record-{record._id}" class="record" style="display: inline-block; margin: 0 1rem;">
 				<input
 					type="text"
-					name="name-{record.id}"
-					id="name-{record.id}"
+					name="name-{record._id}"
+					id="name-{record._id}"
 					value={record.name}
 					required
 					style="display: inline;"
 				/>
-				<button class="delete-record" on:click={deleteRecord(record.id)} style="display: inline;"
+				<button class="delete-record" on:click={deleteRecord(record._id)} style="display: inline;"
 					>X</button
 				>
 				<textarea
-					name="content-{record.id}"
-					id="content-{record.id}"
+					name="content-{record._id}"
+					id="content-{record._id}"
 					cols="30"
 					rows="10"
 					style="display: block;">{record.content}</textarea
 				>
-				<input type="hidden" name="id" value={record.id} />
+				<input type="hidden" name="id" value={record._id} />
 			</div>
 		{/each}
 	</div>

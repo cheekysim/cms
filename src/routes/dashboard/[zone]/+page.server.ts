@@ -14,17 +14,20 @@ export const load = (async (event) => {
 
 	const user: User = await getUser(event.cookies.get('session'));
 
-	const zonedb = (await db.read('zones', { _id: new ObjectId(event.params.zone), user: user.id }))[0];
+	const zonedb = (
+		await db.read('zones', { _id: new ObjectId(event.params.zone), user: user._id })
+	)[0];
 
 	const zone: Zone = {
-		id: zonedb._id.toString(),
+		_id: zonedb._id.toString(),
 		name: zonedb.name,
 		user: zonedb.user
 	};
 
-	const dbrecords = await db.read('records', { zone: zone.id });
+	const dbrecords = await db.read('records', { zone: zone._id });
 
 	const records = JSON.stringify(dbrecords);
+	console.log(records);
 
 	return { zone: zone.name, records: records };
 }) satisfies PageServerLoad;
@@ -40,7 +43,7 @@ async function newRecord({ request, params, cookies }: RequestEvent) {
 		throw redirect(302, '/login');
 	}
 
-	const zone = (await db.read('zones', { _id: new ObjectId(params.zone), user: user.id }))[0];
+	const zone = (await db.read('zones', { _id: new ObjectId(params.zone), user: user._id }))[0];
 
 	if (!zone) {
 		throw redirect(302, '/dashboard');
@@ -57,7 +60,7 @@ async function newRecord({ request, params, cookies }: RequestEvent) {
 		name,
 		type,
 		content,
-		zone: zone._id
+		zone: zone._id.toString()
 	});
 
 	throw redirect(302, `/dashboard/${zone._id}`);
@@ -74,7 +77,7 @@ async function saveRecords({ request, params, cookies }: RequestEvent) {
 		throw redirect(302, '/login');
 	}
 
-	const zone = (await db.read('zones', { _id: new ObjectId(params.zone), user: user.id }))[0];
+	const zone = (await db.read('zones', { _id: new ObjectId(params.zone), user: user._id }))[0];
 
 	if (!zone) {
 		throw redirect(302, '/dashboard');
@@ -113,7 +116,7 @@ async function saveRecords({ request, params, cookies }: RequestEvent) {
 		db.update('records', { _id: record._id }, { $set: record });
 	}
 
-	throw redirect(302, `/dashboard/${zone.id}`);
+	throw redirect(302, `/dashboard/${zone._id.toString()}`);
 }
 
 export const actions: Actions = {

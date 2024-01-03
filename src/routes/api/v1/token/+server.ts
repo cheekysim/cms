@@ -23,9 +23,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	const token = await bcrypt.hash(`${username}-${password}`, 10);
 	const expires = new Date(Date.now());
 	expires.setMonth(expires.getMonth() + 1);
-	await db.deleteMany('tokens', { expires: { $lt: Date.now() } });
-	await db.deleteMany('tokens', { userid: user._id });
-	await db.write('tokens', { userid: user._id, token, expires });
+	await db.deleteMany('tokens', {
+		$or: [{ expires: { $lt: Date.now() } }, { userid: user._id.toString() }]
+	});
+	await db.write('tokens', { userid: user._id.toString(), token, expires });
 
 	// Return token
 	return new Response(JSON.stringify({ token }), { status: 200 });

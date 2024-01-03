@@ -14,7 +14,7 @@ export const getUser = async (sessionID: string | undefined): Promise<User> => {
 	const userid = sessions[0].user;
 	const user = (await db.read('users', { _id: new ObjectId(userid) }))[0];
 	const userData: User = {
-		id: user._id.toString(),
+		_id: user._id.toString(),
 		username: user.username,
 		role: user.role
 	};
