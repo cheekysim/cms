@@ -5,6 +5,8 @@ services:
     pull_policy: build
     build: .
     restart: unless-stopped
+    ports:
+      - ${PORT}:${PORT}
     environment:
       - MONGO_IP=${MONGO_IP}
       - MONGO_DB=${MONGO_DB}
