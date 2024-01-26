@@ -14,7 +14,7 @@
 	};
 </script>
 
-<hx1>Zone {data.zone}</hx1>
+<hx1>Domain {data.domain}</hx1>
 <h2>Your Records</h2>
 <form method="post" action="?/save" style="max-width: 100vw;">
 	<div>

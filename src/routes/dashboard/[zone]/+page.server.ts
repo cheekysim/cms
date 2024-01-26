@@ -1,35 +1,35 @@
 import type { PageServerLoad } from './$types';
 import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import type { User, Zone } from '$lib/types';
+import type { User, Domain } from '$lib/types';
 import { redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/server/getUser';
 import { error } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
-import { handleSessionCheck, handleZoneCheck } from '$lib/server/handleChecks';
+import { handleSessionCheck, handleDomainCheck } from '$lib/server/handleChecks';
 
 export const load = (async (event) => {
 	await handleSessionCheck(event);
-	await handleZoneCheck(event);
+	await handleDomainCheck(event);
 
 	const user: User = await getUser(event.cookies.get('session'));
 
-	const zonedb = (
-		await db.read('zones', { _id: new ObjectId(event.params.zone), user: user._id })
+	const domaindb = (
+		await db.read('domains', { _id: new ObjectId(event.params.domain), user: user._id })
 	)[0];
 
-	const zone: Zone = {
-		_id: zonedb._id.toString(),
-		name: zonedb.name,
-		user: zonedb.user
+	const domain: Domain = {
+		_id: domaindb._id.toString(),
+		name: domaindb.name,
+		user: domaindb.user
 	};
 
-	const dbrecords = await db.read('records', { zone: zone._id });
+	const dbrecords = await db.read('records', { domain: domain._id });
 
 	const records = JSON.stringify(dbrecords);
 	console.log(records);
 
-	return { zone: zone.name, records: records };
+	return { domain: domain.name, records: records };
 }) satisfies PageServerLoad;
 
 async function newRecord({ request, params, cookies }: RequestEvent) {
@@ -43,9 +43,11 @@ async function newRecord({ request, params, cookies }: RequestEvent) {
 		throw redirect(302, '/login');
 	}
 
-	const zone = (await db.read('zones', { _id: new ObjectId(params.zone), user: user._id }))[0];
+	const domain = (
+		await db.read('domains', { _id: new ObjectId(params.domain), user: user._id })
+	)[0];
 
-	if (!zone) {
+	if (!domain) {
 		throw redirect(302, '/dashboard');
 	}
 
@@ -60,10 +62,10 @@ async function newRecord({ request, params, cookies }: RequestEvent) {
 		name,
 		type,
 		content,
-		zone: zone._id.toString()
+		domain: domain._id.toString()
 	});
 
-	throw redirect(302, `/dashboard/${zone._id}`);
+	throw redirect(302, `/dashboard/${domain._id}`);
 }
 
 async function saveRecords({ request, params, cookies }: RequestEvent) {
@@ -77,13 +79,15 @@ async function saveRecords({ request, params, cookies }: RequestEvent) {
 		throw redirect(302, '/login');
 	}
 
-	const zone = (await db.read('zones', { _id: new ObjectId(params.zone), user: user._id }))[0];
+	const domain = (
+		await db.read('domains', { _id: new ObjectId(params.domain), user: user._id })
+	)[0];
 
-	if (!zone) {
+	if (!domain) {
 		throw redirect(302, '/dashboard');
 	}
 
-	const currentRecords = await db.read('records', { zone: zone._id.toString() });
+	const currentRecords = await db.read('records', { domain: domain._id.toString() });
 
 	const data = await request.formData();
 	const IDs = new Set(data.getAll('id'));
@@ -116,7 +120,7 @@ async function saveRecords({ request, params, cookies }: RequestEvent) {
 		db.update('records', { _id: record._id }, { $set: record });
 	}
 
-	throw redirect(302, `/dashboard/${zone._id.toString()}`);
+	throw redirect(302, `/dashboard/${domain._id.toString()}`);
 }
 
 export const actions: Actions = {

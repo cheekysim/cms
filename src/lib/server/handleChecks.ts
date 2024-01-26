@@ -27,14 +27,16 @@ export const handleSessionCheck = async (event: RequestEvent) => {
 	throw redirect(302, `/login?redirectTo=${redirectTo.slice(1)}&error=Session%20Expired`);
 };
 
-export const handleZoneCheck = async (event: RequestEvent) => {
-	const session = (await db.read('sessions', { _id: new ObjectId(event.cookies.get('session')) }))[0];
+export const handleDomainCheck = async (event: RequestEvent) => {
+	const session = (
+		await db.read('sessions', { _id: new ObjectId(event.cookies.get('session')) })
+	)[0];
 	if (!session) {
 		throw redirect(302, '/login');
 	}
-	const zoneID = new ObjectId(event.params.zone);
-	const zone = (await db.read('zones', { user: session.user, _id: new ObjectId(zoneID) }))[0];
-	if (!zone) {
+	const domainID = new ObjectId(event.params.domain);
+	const domain = (await db.read('domains', { user: session.user, _id: new ObjectId(domainID) }))[0];
+	if (!domain) {
 		throw redirect(302, '/dashboard');
 	}
 	return;

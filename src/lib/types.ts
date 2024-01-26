@@ -4,7 +4,7 @@ type User = {
 	role: 'admin' | 'user';
 };
 
-type Zone = {
+type Domain = {
 	_id: string;
 	name: string;
 	user: string;
@@ -15,7 +15,7 @@ type Record = {
 	name: string;
 	type: string;
 	content: string;
-	zone: string;
+	domain: string;
 };
 
-export type { User, Zone, Record };
+export type { User, Domain, Record };
