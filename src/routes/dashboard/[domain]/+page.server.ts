@@ -65,6 +65,8 @@ async function newRecord({ request, params, cookies }: RequestEvent) {
 		domain: domain._id.toString()
 	});
 
+	updateWebsite(domain.cms_url, domain.cms_token);
+
 	throw redirect(302, `/dashboard/${domain._id}`);
 }
 
@@ -120,7 +122,23 @@ async function saveRecords({ request, params, cookies }: RequestEvent) {
 		db.update('records', { _id: record._id }, { $set: record });
 	}
 
+	updateWebsite(domain.cms_url, domain.cms_token);
+
 	throw redirect(302, `/dashboard/${domain._id.toString()}`);
+}
+
+async function updateWebsite(url: string | null, token: string | null) {
+	// TODO: Make this send off all of the records to the website
+	if (!url || !token) return;
+
+	const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+	const status = res.status;
+
+	if (status !== 200) {
+		console.log(await res.text());
+	}
+
+	return status;
 }
 
 export const actions: Actions = {
