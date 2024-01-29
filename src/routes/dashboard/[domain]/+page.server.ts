@@ -5,7 +5,7 @@ import type { User, Domain } from '$lib/types';
 import { redirect } from '@sveltejs/kit';
 import { getUser } from '$lib/server/getUser';
 import { error } from '@sveltejs/kit';
-import { ObjectId } from 'mongodb';
+import { ObjectId, type WithId } from 'mongodb';
 import { handleSessionCheck, handleDomainCheck } from '$lib/server/handleChecks';
 
 export const load = (async (event) => {
@@ -65,7 +65,7 @@ async function newRecord({ request, params, cookies }: RequestEvent) {
 		domain: domain._id.toString()
 	});
 
-	updateWebsite(domain.cms_url, domain.cms_token);
+	updateWebsite(domain);
 
 	throw redirect(302, `/dashboard/${domain._id}`);
 }
@@ -122,16 +122,26 @@ async function saveRecords({ request, params, cookies }: RequestEvent) {
 		db.update('records', { _id: record._id }, { $set: record });
 	}
 
-	updateWebsite(domain.cms_url, domain.cms_token);
+	updateWebsite(domain);
 
 	throw redirect(302, `/dashboard/${domain._id.toString()}`);
 }
 
-async function updateWebsite(url: string | null, token: string | null) {
-	// TODO: Make this send off all of the records to the website
-	if (!url || !token) return;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function updateWebsite(domain: WithId<any>) {
+	if (!domain.cms_url || !domain.cms_token) return;
 
-	const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+	const records = await db.read('records', { domain: domain._id.toString() });
+
+	const body = JSON.stringify({ ...records });
+
+	console.log(body);
+
+	const res = await fetch(domain.cms_url, {
+		headers: { Authorization: `Bearer ${domain.cms_token}` },
+		method: 'POST',
+		body
+	});
 	const status = res.status;
 
 	if (status !== 200) {
