@@ -5,6 +5,8 @@ services:
     pull_policy: build
     build: .
     restart: unless-stopped
+    stdin_open: true
+    tty: true
     ports:
       - ${PORT}:${PORT}
     environment:
