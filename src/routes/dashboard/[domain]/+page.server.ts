@@ -138,9 +138,14 @@ async function updateWebsite(domain: WithId<any>) {
 	console.log(body);
 
 	const res = await fetch(domain.cms_url, {
-		headers: { Authorization: `Bearer ${domain.cms_token}` },
+		headers: {
+			Authorization: `Bearer ${domain.cms_token}`,
+			'Content-Type': 'application/json',
+			Accept: 'application/json'
+		},
 		method: 'POST',
-		body
+		body,
+		mode: 'cors'
 	});
 	const status = res.status;
 
