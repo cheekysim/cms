@@ -133,7 +133,7 @@ async function updateWebsite(domain: WithId<any>) {
 
 	const records = await db.read('records', { domain: domain._id.toString() });
 
-	const body = JSON.stringify({ ...records });
+	const body = JSON.stringify(records);
 
 	console.log(body);
 
