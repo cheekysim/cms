@@ -14,6 +14,7 @@ type Record = {
 	_id: string;
 	name: string;
 	type: string;
+	title: string | null;
 	content: string;
 	domain: string;
 };

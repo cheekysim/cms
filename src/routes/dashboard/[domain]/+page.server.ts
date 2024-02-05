@@ -54,7 +54,12 @@ async function newRecord({ request, params, cookies }: RequestEvent) {
 	const data = await request.formData();
 	const name = data.get('name')?.toString();
 	const type = data.get('type')?.toString() || 'text';
-	const content = data.get('content')?.toString();
+	let content = data.get(`content`)?.toString();
+
+	if (type === 'quote' && content) {
+		const title = data.get(`title`)?.toString();
+		content = JSON.stringify({ title, content });
+	}
 
 	if (!name || !type || !content) return error(400);
 
@@ -105,7 +110,12 @@ async function saveRecords({ request, params, cookies }: RequestEvent) {
 	for (const id of IDs) {
 		const name = data.get(`name-${id}`)?.toString();
 		const type = data.get(`type-${id}`)?.toString() || 'text';
-		const content = data.get(`content-${id}`)?.toString();
+		let content = data.get(`content-${id}`)?.toString();
+
+		if (type === 'quote' && content) {
+			const title = data.get(`title-${id}`)?.toString();
+			content = JSON.stringify({ title, content });
+		}
 
 		console.log({ name, type, content, id });
 
