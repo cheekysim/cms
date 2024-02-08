@@ -19,6 +19,7 @@ export const handleToken = async (requestEvent: RequestEvent) => {
 	// Check if token is valid
 	const token = authHeader.replace('Bearer ', '');
 	const tokenData = await db.read('tokens', { token });
+	console.log(tokenData);
 	if (tokenData.length === 0) {
 		return new Response(JSON.stringify({ message: 'Token is invalid' }), {
 			status: 401
