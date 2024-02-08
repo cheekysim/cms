@@ -28,5 +28,8 @@ export const POST: RequestHandler = async ({ request }) => {
 	await db.write('tokens', { userid: domain.user.toString(), token, expires });
 
 	// Return token
-	return new Response(JSON.stringify({ token }), { status: 200 });
+	return new Response(JSON.stringify({ token }), {
+		status: 200,
+		headers: { 'Content-Type': 'application/json' }
+	});
 };

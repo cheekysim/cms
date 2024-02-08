@@ -23,5 +23,8 @@ export const GET: RequestHandler = async (request) => {
 
 	const records = await db.read('records', { domain: domain });
 
-	return new Response(JSON.stringify(records), { status: 200 });
+	return new Response(JSON.stringify(records), {
+		status: 200,
+		headers: { 'Content-Type': 'application/json' }
+	});
 };

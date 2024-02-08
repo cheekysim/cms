@@ -12,5 +12,7 @@ export const GET: RequestHandler = async (request) => {
 		});
 	}
 	console.log(domains);
-	return new Response(JSON.stringify({ domains: [...domains] }));
+	return new Response(JSON.stringify({ domains: [...domains] }), {
+		headers: { 'Content-Type': 'application/json' }
+	});
 };
