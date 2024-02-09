@@ -6,7 +6,7 @@ services:
     build: .
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:${PORT}/health']
+      test: ['CMD', 'wget', '--no-cache', '--spider', 'http://localhost:${/PORT}/health']
       interval: 1m
       timeout: 10s
       retries: 5
