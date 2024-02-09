@@ -5,8 +5,11 @@ services:
     pull_policy: build
     build: .
     restart: unless-stopped
-    stdin_open: true
-    tty: true
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${PORT}/health']
+      interval: 1m
+      timeout: 10s
+      retries: 5
     ports:
       - ${PORT}:${PORT}
     environment:
